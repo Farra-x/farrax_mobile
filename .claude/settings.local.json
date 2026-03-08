@@ -13,7 +13,11 @@
       "Bash(mkdir -p \"$dir\")",
       "Bash(touch \"$dir/.gitkeep\")",
       "Bash(done)",
-      "Bash(flutter analyze)"
+      "Bash(flutter analyze)",
+      "Bash(flutter emulators)",
+      "Bash(flutter emulators --create --name farrax_dev)",
+      "Bash(flutter doctor)",
+      "Bash(flutter devices)"
     ]
   }
 }

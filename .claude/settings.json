@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(winget install --id EclipseAdoptium.Temurin.21.JDK --silent --accept-source-agreements --accept-package-agreements)",
+      "Bash(flutter config --jdk-dir \"C:/Program Files/Eclipse Adoptium/jdk-21.0.10.7-hotspot\")"
+    ]
+  }
+}
