@@ -29,8 +29,11 @@ dependencies:
   # Secure Storage (for JWT tokens)
   flutter_secure_storage: ^9.0.0
 
-  # EID / Bluetooth
-  flutter_blue_plus: ^1.31.0
+  # EID / Bluetooth & Scanner
+  flutter_blue_plus: ^1.31.15
+  mobile_scanner: ^5.2.3
+  google_mlkit_text_recognition: ^0.13.1
+  permission_handler: ^11.3.1
 
   # UI & Utilities
   intl: ^0.19.0

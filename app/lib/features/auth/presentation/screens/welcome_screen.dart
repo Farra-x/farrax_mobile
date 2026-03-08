@@ -162,7 +162,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             borderRadius: BorderRadius.circular(14),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF1A7A3C).withOpacity(0.25),
+                                color: const Color(0xFF1A7A3C).withValues(alpha: 0.25),
                                 blurRadius: 16,
                                 offset: const Offset(0, 6),
                               ),
@@ -199,7 +199,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                 fontSize: 11,
                                 fontWeight: FontWeight.w400,
                                 letterSpacing: 0.5,
-                                color: const Color(0xFF1A7A3C).withOpacity(0.5),
+                                color: const Color(0xFF1A7A3C).withValues(alpha: 0.5),
                               ),
                             ),
                           ],
@@ -212,10 +212,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     position: _titleSlide,
                     child: FadeTransition(
                       opacity: _titleFade,
-                      child: Column(
+                      child: const Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Herd\nManagement,',
                             style: TextStyle(
                               fontSize: 46,
@@ -225,8 +225,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               letterSpacing: -1.5,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          const Text(
+                          SizedBox(height: 4),
+                          Text(
                             'Simplified.',
                             style: TextStyle(
                               fontSize: 46,
@@ -250,7 +250,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         style: TextStyle(
                           fontSize: 15.5,
                           height: 1.6,
-                          color: const Color(0xFF0D1F14).withOpacity(0.5),
+                          color: const Color(0xFF0D1F14).withValues(alpha: 0.5),
                           fontWeight: FontWeight.w400,
                           letterSpacing: 0.1,
                         ),
@@ -326,7 +326,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                 'Free to use · Login & sync coming soon',
                                 style: TextStyle(
                                   fontSize: 12.5,
-                                  color: const Color(0xFF0D1F14).withOpacity(0.4),
+                                  color: const Color(0xFF0D1F14).withValues(alpha: 0.4),
                                   fontWeight: FontWeight.w500,
                                   letterSpacing: 0.2,
                                 ),
@@ -359,10 +359,10 @@ class _FeaturePill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A7A3C).withOpacity(0.07),
+        color: const Color(0xFF1A7A3C).withValues(alpha: 0.07),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: const Color(0xFF1A7A3C).withOpacity(0.15),
+          color: const Color(0xFF1A7A3C).withValues(alpha: 0.15),
           width: 1,
         ),
       ),
@@ -390,14 +390,14 @@ class _BackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF1A7A3C).withOpacity(0.03)
+      ..color = const Color(0xFF1A7A3C).withValues(alpha: 0.03)
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(Offset(size.width + 40, -40), 180, paint);
     canvas.drawCircle(Offset(-60, size.height + 20), 160, paint);
 
     final paint2 = Paint()
-      ..color = const Color(0xFFF0A500).withOpacity(0.04)
+      ..color = const Color(0xFFF0A500).withValues(alpha: 0.04)
       ..style = PaintingStyle.fill;
     canvas.drawCircle(Offset(size.width * 0.8, size.height * 0.55), 120, paint2);
   }

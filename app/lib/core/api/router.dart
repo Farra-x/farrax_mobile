@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+import '../../features/animals/presentation/screens/add_animal_screen.dart';
+import '../../features/animals/presentation/screens/animal_detail_screen.dart';
+import '../../features/animals/presentation/screens/animals_screen.dart';
 import '../../features/auth/presentation/screens/welcome_screen.dart';
+import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
+import '../../features/scanner/presentation/screens/ble_connect_screen.dart';
+import '../../shared/widgets/home_shell.dart';
 
 part 'router.g.dart';
 
@@ -12,6 +19,7 @@ class AppRoutes {
   static const records = '/records';
   static const health = '/health';
   static const movements = '/movements';
+  static const scannerBle = '/scanner/ble';
 }
 
 @riverpod
@@ -37,7 +45,14 @@ GoRouter appRouter(AppRouterRef ref) {
             routes: [
               GoRoute(
                 path: 'add',
-                builder: (context, state) => const AddAnimalScreen(),
+                builder: (context, state) {
+                  final Map<String, dynamic>? extra =
+                      state.extra as Map<String, dynamic>?;
+                  return AddAnimalScreen(
+                    initialTagNumber:
+                        extra?['tagNumber'] as String?,
+                  );
+                },
               ),
               GoRoute(
                 path: ':id',
@@ -49,69 +64,42 @@ GoRouter appRouter(AppRouterRef ref) {
           ),
           GoRoute(
             path: AppRoutes.records,
-            builder: (context, state) => const RecordsScreen(),
+            builder: (context, state) => const _PlaceholderScreen(title: 'Records'),
           ),
           GoRoute(
             path: AppRoutes.health,
-            builder: (context, state) => const HealthScreen(),
+            builder: (context, state) => const _PlaceholderScreen(title: 'Health'),
           ),
           GoRoute(
             path: AppRoutes.movements,
-            builder: (context, state) => const MovementsScreen(),
+            builder: (context, state) => const _PlaceholderScreen(title: 'Movements'),
           ),
         ],
+      ),
+      GoRoute(
+        path: AppRoutes.scannerBle,
+        builder: (context, state) => const BleConnectScreen(),
       ),
     ],
   );
 }
 
-// Placeholder screens — to be replaced as features are built out
-class HomeShell extends StatelessWidget {
-  final Widget child;
-  const HomeShell({super.key, required this.child});
-  @override
-  Widget build(BuildContext context) => child;
-}
+class _PlaceholderScreen extends StatelessWidget {
+  final String title;
+  const _PlaceholderScreen({required this.title});
 
-class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
   @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Dashboard')));
-}
-
-class AnimalsScreen extends StatelessWidget {
-  const AnimalsScreen({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Animals')));
-}
-
-class AddAnimalScreen extends StatelessWidget {
-  const AddAnimalScreen({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Add Animal')));
-}
-
-class AnimalDetailScreen extends StatelessWidget {
-  final String animalId;
-  const AnimalDetailScreen({super.key, required this.animalId});
-  @override
-  Widget build(BuildContext context) => Scaffold(body: Center(child: Text('Animal $animalId')));
-}
-
-class RecordsScreen extends StatelessWidget {
-  const RecordsScreen({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Records')));
-}
-
-class HealthScreen extends StatelessWidget {
-  const HealthScreen({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Health')));
-}
-
-class MovementsScreen extends StatelessWidget {
-  const MovementsScreen({super.key});
-  @override
-  Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Movements')));
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(
+          title: Text(title),
+          backgroundColor: const Color(0xFF1A7A3C),
+          foregroundColor: Colors.white,
+        ),
+        body: Center(
+          child: Text(
+            '$title — coming soon',
+            style: const TextStyle(color: Color(0xFF888888)),
+          ),
+        ),
+      );
 }
