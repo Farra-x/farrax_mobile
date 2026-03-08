@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter --version)",
+      "Bash(flutter pub get)",
+      "Bash(mkdir -p \"c:/Users/rakes/OneDrive/Desktop/Farrax/farrax_mobile/app/assets/images\" \"c:/Users/rakes/OneDrive/Desktop/Farrax/farrax_mobile/app/assets/icons\")",
+      "Bash(touch \"c:/Users/rakes/OneDrive/Desktop/Farrax/farrax_mobile/app/assets/images/.gitkeep\" \"c:/Users/rakes/OneDrive/Desktop/Farrax/farrax_mobile/app/assets/icons/.gitkeep\")",
+      "Bash(flutter pub run build_runner build --delete-conflicting-outputs)",
+      "Bash(BASE=\"c:/Users/rakes/OneDrive/Desktop/Farrax/farrax_mobile/app/lib/features\")",
+      "Bash(for feature in animals records health movements auth)",
+      "Bash(do)",
+      "Bash(for dir in \"$BASE/$feature/data\" \"$BASE/$feature/domain/models\" \"$BASE/$feature/domain/repositories\" \"$BASE/$feature/presentation/screens\" \"$BASE/$feature/presentation/providers\" \"$BASE/$feature/presentation/widgets\")",
+      "Bash(mkdir -p \"$dir\")",
+      "Bash(touch \"$dir/.gitkeep\")",
+      "Bash(done)",
+      "Bash(flutter analyze)"
+    ]
+  }
+}
