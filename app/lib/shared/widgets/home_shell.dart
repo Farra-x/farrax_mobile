@@ -47,6 +47,20 @@ class HomeShell extends ConsumerWidget {
       });
     });
 
+    // Show BLE diagnostic messages as snackbars (debug aid)
+    ref.listen(bleStatusStreamProvider, (_, AsyncValue<String> next) {
+      next.whenData((String msg) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(msg),
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: const Color(0xFF1A1A2E),
+          ),
+        );
+      });
+    });
+
     return Scaffold(
       body: child,
       bottomNavigationBar: NavigationBar(

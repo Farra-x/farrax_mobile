@@ -9,10 +9,6 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:path_provider/path_provider.dart';
 
-// Farrax ESP32 Super Mini UUIDs
-const String _farraxServiceUuid = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
-const String _farraxCharUuid    = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
-
 // Known reader device name fragments
 const List<String> _knownDeviceNames = ['Farrax-Scanner', 'Farrax', 'XRS2', 'HR5', 'AWR300'];
 
@@ -23,10 +19,13 @@ class ScannerService {
   final StreamController<BluetoothDevice?> _connectionController =
       StreamController<BluetoothDevice?>.broadcast();
 
-  Stream<String> get tagStream => _tagController.stream;
+  /// Emits diagnostic status messages (subscribe to show as snackbars).
+  final StreamController<String> _statusController =
+      StreamController<String>.broadcast();
 
-  /// Emits the connected device on connect, null on disconnect.
+  Stream<String> get tagStream => _tagController.stream;
   Stream<BluetoothDevice?> get connectionStream => _connectionController.stream;
+  Stream<String> get statusStream => _statusController.stream;
 
   BluetoothDevice? _connectedDevice;
   StreamSubscription<List<int>>? _txSubscription;
@@ -80,21 +79,57 @@ class ScannerService {
 
   Future<void> _subscribeToFarraxChar(BluetoothDevice device) async {
     final List<BluetoothService> services = await device.discoverServices();
+    _statusController.add('Found ${services.length} BLE service(s)');
+
+    // Try exact UUID match first, then fall back to any notify characteristic
+    BluetoothCharacteristic? target;
+
     for (final BluetoothService service in services) {
-      if (service.uuid.str128.toLowerCase() == _farraxServiceUuid) {
+      final String svcId = service.uuid.str128.toLowerCase();
+      if (svcId.contains('4fafc201')) {
+        _statusController.add('Farrax service matched');
         for (final BluetoothCharacteristic char in service.characteristics) {
-          if (char.uuid.str128.toLowerCase() == _farraxCharUuid) {
-            await char.setNotifyValue(true);
-            _txSubscription = char.onValueReceived.listen((List<int> value) {
-              final String raw = utf8.decode(value).trim();
-              final String? tag = validateTag(raw);
-              if (tag != null) _tagController.add(tag);
-            });
-            return;
+          if (char.uuid.str128.toLowerCase().contains('beb5483e')) {
+            target = char;
+            break;
           }
         }
       }
     }
+
+    // Fallback: first notify-capable characteristic across all services
+    if (target == null) {
+      _statusController.add('UUID not matched — trying any notify char');
+      for (final BluetoothService service in services) {
+        for (final BluetoothCharacteristic char in service.characteristics) {
+          if (char.properties.notify) {
+            target = char;
+            break;
+          }
+        }
+        if (target != null) break;
+      }
+    }
+
+    if (target == null) {
+      _statusController.add('ERROR: no notify characteristic found');
+      return;
+    }
+
+    await target.setNotifyValue(true);
+    _statusController.add('Subscribed to ${target.uuid.str128} — ready');
+
+    _txSubscription = target.onValueReceived.listen((List<int> value) {
+      final String raw = utf8.decode(value).trim();
+      _statusController.add('BLE raw: "$raw"');
+      final String? tag = validateTag(raw);
+      if (tag != null) {
+        _statusController.add('Tag valid: $tag');
+        _tagController.add(tag);
+      } else {
+        _statusController.add('Tag invalid — no popup');
+      }
+    });
   }
 
   // ─── Camera / Barcode ──────────────────────────────────────────────────────
@@ -173,6 +208,7 @@ class ScannerService {
     disconnectDevice();
     _tagController.close();
     _connectionController.close();
+    _statusController.close();
   }
 }
 

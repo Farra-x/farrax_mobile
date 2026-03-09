@@ -22,6 +22,14 @@ Stream<String> bleTagStream(BleTagStreamRef ref) {
   return ref.watch(scannerServiceProvider).tagStream;
 }
 
+// ─── BLE Status Stream ────────────────────────────────────────────────────────
+// Diagnostic messages from the scanner service (subscription setup, raw bytes).
+
+@Riverpod(keepAlive: true)
+Stream<String> bleStatusStream(BleStatusStreamRef ref) {
+  return ref.watch(scannerServiceProvider).statusStream;
+}
+
 // ─── Connected Device Stream ──────────────────────────────────────────────────
 // keepAlive so it stays subscribed even when HomeShell is not in the tree
 // (e.g. while the user is on the BLE connect screen).
