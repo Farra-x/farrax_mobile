@@ -309,6 +309,8 @@ class _FarmSetupPage extends StatelessWidget {
             DropdownButtonFormField<String>(
               initialValue: selectedCountry,
               style: _fieldTextStyle,
+              dropdownColor: Colors.white,
+              menuMaxHeight: 300,
               decoration: const InputDecoration(
                 labelText: 'Country',
                 prefixIcon: Icon(Icons.public_rounded),

@@ -121,13 +121,15 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
                       selected: selected,
                       onSelected: (_) =>
                           ref.read(animalListFilterProvider.notifier).set(f),
+                      backgroundColor: Colors.white,
                       selectedColor:
-                          const Color(0xFF1A7A3C).withValues(alpha: 0.15),
+                          const Color(0xFF1A7A3C).withValues(alpha: 0.12),
                       checkmarkColor: const Color(0xFF1A7A3C),
+                      showCheckmark: false,
                       labelStyle: TextStyle(
                         color: selected
                             ? const Color(0xFF1A7A3C)
-                            : const Color(0xFF555555),
+                            : const Color(0xFF444444),
                         fontWeight: selected
                             ? FontWeight.w700
                             : FontWeight.w500,
