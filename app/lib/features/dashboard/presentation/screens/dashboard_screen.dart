@@ -22,7 +22,10 @@ class DashboardScreen extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => ScanInputSheet(tagHandler: ref.read(tagHandlerProvider)),
+      builder: (_) => ScanInputSheet(
+        tagHandler: ref.read(tagHandlerProvider),
+        outerContext: context,
+      ),
     );
   }
 
@@ -320,7 +323,7 @@ class _StatCard extends StatelessWidget {
     return Container(
       width: 130,
       margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),

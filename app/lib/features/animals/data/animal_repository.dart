@@ -76,8 +76,8 @@ class AnimalRepository {
     final query = _db.selectOnly(_db.birthEvents)
       ..addColumns([count])
       ..where(
-        _db.birthEvents.birthDate.isBiggerOrEqualValue(start) &
-            _db.birthEvents.birthDate.isSmallerThanValue(end),
+        _db.birthEvents.eventDate.isBiggerOrEqualValue(start) &
+            _db.birthEvents.eventDate.isSmallerThanValue(end),
       );
     final TypedResult row = await query.getSingle();
     return row.read(count) ?? 0;
@@ -91,8 +91,8 @@ class AnimalRepository {
     final query = _db.selectOnly(_db.movementEvents)
       ..addColumns([count])
       ..where(
-        _db.movementEvents.movementDate.isBiggerOrEqualValue(start) &
-            _db.movementEvents.movementDate.isSmallerThanValue(end),
+        _db.movementEvents.eventDate.isBiggerOrEqualValue(start) &
+            _db.movementEvents.eventDate.isSmallerThanValue(end),
       );
     final TypedResult row = await query.getSingle();
     return row.read(count) ?? 0;
@@ -103,23 +103,35 @@ class AnimalRepository {
   Stream<List<BirthEvent>> watchBirthEvents(String animalId) =>
       (_db.select(_db.birthEvents)
         ..where((t) => t.animalId.equals(animalId))
-        ..orderBy([(t) => OrderingTerm.desc(t.birthDate)]))
+        ..orderBy([(t) => OrderingTerm.desc(t.eventDate)]))
           .watch();
 
   Stream<List<MovementEvent>> watchMovementEvents(String animalId) =>
       (_db.select(_db.movementEvents)
         ..where((t) => t.animalId.equals(animalId))
-        ..orderBy([(t) => OrderingTerm.desc(t.movementDate)]))
+        ..orderBy([(t) => OrderingTerm.desc(t.eventDate)]))
           .watch();
 
   Stream<List<MedicineEvent>> watchMedicineEvents(String animalId) =>
       (_db.select(_db.medicineEvents)
         ..where((t) => t.animalId.equals(animalId))
-        ..orderBy([(t) => OrderingTerm.desc(t.administeredDate)]))
+        ..orderBy([(t) => OrderingTerm.desc(t.eventDate)]))
           .watch();
 
   Stream<List<DeathEvent>> watchDeathEvents(String animalId) =>
       (_db.select(_db.deathEvents)
         ..where((t) => t.animalId.equals(animalId)))
+          .watch();
+
+  Stream<List<TbTestEvent>> watchTbTestEvents(String animalId) =>
+      (_db.select(_db.tbTestEvents)
+        ..where((t) => t.animalId.equals(animalId))
+        ..orderBy([(t) => OrderingTerm.desc(t.testDate)]))
+          .watch();
+
+  Stream<List<HealthEvent>> watchHealthEvents(String animalId) =>
+      (_db.select(_db.healthEvents)
+        ..where((t) => t.animalId.equals(animalId))
+        ..orderBy([(t) => OrderingTerm.desc(t.eventDate)]))
           .watch();
 }

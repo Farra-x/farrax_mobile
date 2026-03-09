@@ -51,10 +51,80 @@ class _AddAnimalScreenState extends ConsumerState<AddAnimalScreen> {
 
   // ─── Scan helpers ─────────────────────────────────────────────────────────
 
+  /// Scan into the main tag field — opens camera, then checks if already registered.
+  Future<void> _scanMainTag() async {
+    final ScannerService svc = ref.read(scannerServiceProvider);
+    final String? tag = await svc.scanWithCamera(context);
+    if (tag == null || !mounted) return;
+
+    // Check if already registered locally
+    final Animal? existing =
+        await ref.read(animalRepositoryProvider).findByTagNumber(tag);
+    if (!mounted) return;
+
+    if (existing != null) {
+      await showDialog<void>(
+        context: context,
+        builder: (BuildContext ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Row(
+            children: [
+              Icon(Icons.info_rounded, color: Color(0xFF1A7A3C)),
+              SizedBox(width: 8),
+              Text('Already Registered'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                tag,
+                style: const TextStyle(
+                  fontFamily: 'monospace',
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                  letterSpacing: 1,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '${existing.breed} · ${existing.sex == 'M' ? 'Male' : 'Female'} · Herd ${existing.herdNumber}',
+                style: const TextStyle(color: Color(0xFF555555), fontSize: 14),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Stay Here'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1A7A3C),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: () {
+                Navigator.pop(ctx);
+                context.pushReplacement('/animals/${existing.id}');
+              },
+              child: const Text('View Animal'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      setState(() => _tagCtrl.text = tag);
+    }
+  }
+
+  /// Scan into dam/sire fields — opens camera, just populates the field.
   Future<void> _scanIntoField(TextEditingController ctrl) async {
     final ScannerService svc = ref.read(scannerServiceProvider);
-    final String? tag = await svc.manualEntry(context);
-    if (tag != null) setState(() => ctrl.text = tag);
+    final String? tag = await svc.scanWithCamera(context);
+    if (tag != null && mounted) setState(() => ctrl.text = tag);
   }
 
   // ─── Breed picker ─────────────────────────────────────────────────────────
@@ -262,7 +332,7 @@ class _AddAnimalScreenState extends ConsumerState<AddAnimalScreen> {
             const _SectionLabel('Tag Number'),
             _TagField(
               controller: _tagCtrl,
-              onScan: () => _scanIntoField(_tagCtrl),
+              onScan: _scanMainTag,
             ),
             const SizedBox(height: 20),
 

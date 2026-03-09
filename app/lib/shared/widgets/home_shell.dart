@@ -28,7 +28,10 @@ class HomeShell extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => ScanInputSheet(tagHandler: ref.read(tagHandlerProvider)),
+      builder: (_) => ScanInputSheet(
+        tagHandler: ref.read(tagHandlerProvider),
+        outerContext: context,
+      ),
     );
   }
 

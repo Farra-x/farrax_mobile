@@ -27,7 +27,10 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => ScanInputSheet(tagHandler: ref.read(tagHandlerProvider)),
+      builder: (_) => ScanInputSheet(
+        tagHandler: ref.read(tagHandlerProvider),
+        outerContext: context,
+      ),
     );
   }
 
@@ -174,6 +177,7 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'fab_animals',
         onPressed: () => context.push('/animals/add'),
         backgroundColor: const Color(0xFF1A7A3C),
         foregroundColor: Colors.white,

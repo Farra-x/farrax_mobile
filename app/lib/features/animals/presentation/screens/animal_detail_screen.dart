@@ -65,6 +65,10 @@ class _AnimalDetailView extends ConsumerWidget {
         ref.watch(animalMedicineEventsProvider(animal.id));
     final AsyncValue<List<DeathEvent>> deaths =
         ref.watch(animalDeathEventsProvider(animal.id));
+    final AsyncValue<List<TbTestEvent>> tbTests =
+        ref.watch(animalTbTestEventsProvider(animal.id));
+    final AsyncValue<List<HealthEvent>> healthEvents =
+        ref.watch(animalHealthEventsProvider(animal.id));
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7F5),
@@ -184,27 +188,35 @@ class _AnimalDetailView extends ConsumerWidget {
                   child: Row(
                     children: [
                       _ActionButton(
+                        icon: Icons.child_care_rounded,
+                        label: 'Birth',
+                        color: const Color(0xFF1A7A3C),
+                        onTap: () => context.push(
+                            '/records/birth/add?tag=${animal.tagNumber}'),
+                      ),
+                      const SizedBox(width: 10),
+                      _ActionButton(
                         icon: Icons.swap_horiz_rounded,
                         label: 'Movement',
                         color: const Color(0xFFF0A500),
-                        onTap: () => context
-                            .push('/movements/add?animalId=${animal.id}'),
+                        onTap: () => context.push(
+                            '/movements/add?tag=${animal.tagNumber}'),
                       ),
                       const SizedBox(width: 10),
                       _ActionButton(
                         icon: Icons.medical_services_rounded,
                         label: 'Health',
                         color: const Color(0xFF0D6EAF),
-                        onTap: () => context
-                            .push('/health/add?animalId=${animal.id}'),
+                        onTap: () => context.push(
+                            '/health/event/add?tag=${animal.tagNumber}'),
                       ),
                       const SizedBox(width: 10),
                       _ActionButton(
-                        icon: Icons.edit_rounded,
-                        label: 'Edit',
-                        color: const Color(0xFF555555),
-                        onTap: () =>
-                            context.push('/animals/${animal.id}/edit'),
+                        icon: Icons.cancel_rounded,
+                        label: 'Death',
+                        color: Colors.red,
+                        onTap: () => context.push(
+                            '/records/death/add?tag=${animal.tagNumber}'),
                       ),
                     ],
                   ),
@@ -230,6 +242,8 @@ class _AnimalDetailView extends ConsumerWidget {
                   movements: movements,
                   medicines: medicines,
                   deaths: deaths,
+                  tbTests: tbTests,
+                  healthEvents: healthEvents,
                   animalDob: animal.dateOfBirth,
                 ),
 
@@ -250,6 +264,8 @@ class _TimelineSection extends StatelessWidget {
   final AsyncValue<List<MovementEvent>> movements;
   final AsyncValue<List<MedicineEvent>> medicines;
   final AsyncValue<List<DeathEvent>> deaths;
+  final AsyncValue<List<TbTestEvent>> tbTests;
+  final AsyncValue<List<HealthEvent>> healthEvents;
   final DateTime animalDob;
 
   const _TimelineSection({
@@ -257,6 +273,8 @@ class _TimelineSection extends StatelessWidget {
     required this.movements,
     required this.medicines,
     required this.deaths,
+    required this.tbTests,
+    required this.healthEvents,
     required this.animalDob,
   });
 
@@ -268,12 +286,12 @@ class _TimelineSection extends StatelessWidget {
     births.whenData((List<BirthEvent> list) {
       for (final BirthEvent e in list) {
         items.add(_TimelineItem(
-          date: e.birthDate,
+          date: e.eventDate,
           icon: Icons.child_care_rounded,
           color: const Color(0xFF1A7A3C),
           title: 'Birth Recorded',
-          subtitle: 'Difficulty: ${e.difficultyScore}/5'
-              '${e.vetInvolved ? ' · Vet involved' : ''}',
+          subtitle: 'Difficulty: ${e.calvingDifficulty ?? 1}/5'
+              '${e.vetAttended ? ' · Vet attended' : ''}',
         ));
       }
     });
@@ -282,14 +300,14 @@ class _TimelineSection extends StatelessWidget {
     movements.whenData((List<MovementEvent> list) {
       for (final MovementEvent e in list) {
         items.add(_TimelineItem(
-          date: e.movementDate,
+          date: e.eventDate,
           icon: Icons.swap_horiz_rounded,
           color: const Color(0xFFF0A500),
-          title: 'Movement ${e.direction}',
+          title: 'Movement ${e.movementType.toUpperCase()}',
           subtitle: [
-            if (e.fromHerdNumber != null) 'From: ${e.fromHerdNumber}',
-            if (e.toHerdNumber != null) 'To: ${e.toHerdNumber}',
-            if (e.reason != null) e.reason!,
+            if (e.originFarmName != null) 'From: ${e.originFarmName}',
+            if (e.destinationFarmName != null) 'To: ${e.destinationFarmName}',
+            if (e.notes != null) e.notes!,
           ].join(' · '),
         ));
       }
@@ -299,12 +317,12 @@ class _TimelineSection extends StatelessWidget {
     medicines.whenData((List<MedicineEvent> list) {
       for (final MedicineEvent e in list) {
         items.add(_TimelineItem(
-          date: e.administeredDate,
+          date: e.eventDate,
           icon: Icons.medical_services_rounded,
           color: const Color(0xFF0D6EAF),
-          title: e.medicineName,
+          title: e.drugName,
           subtitle:
-              '${e.dosage}${e.dosageUnit} · ${e.route}',
+              '${e.doseGiven ?? 0}${e.doseUnit ?? ''} · ${e.route ?? ''}',
         ));
       }
     });
@@ -313,14 +331,40 @@ class _TimelineSection extends StatelessWidget {
     deaths.whenData((List<DeathEvent> list) {
       for (final DeathEvent e in list) {
         items.add(_TimelineItem(
-          date: e.deathDate,
+          date: e.eventDate,
           icon: Icons.cancel_rounded,
           color: Colors.red,
           title: 'Death / Disposal',
           subtitle: [
-            if (e.cause != null) e.cause!,
+            if (e.causeOfDeath != null) e.causeOfDeath!,
             if (e.disposalMethod != null) e.disposalMethod!,
           ].join(' · '),
+        ));
+      }
+    });
+
+    // Add TB test events
+    tbTests.whenData((List<TbTestEvent> list) {
+      for (final TbTestEvent e in list) {
+        items.add(_TimelineItem(
+          date: e.testDate,
+          icon: Icons.biotech_rounded,
+          color: const Color(0xFF6A1B9A),
+          title: 'TB Test — ${e.result.toUpperCase()}',
+          subtitle: e.vetName != null ? 'Vet: ${e.vetName}' : '',
+        ));
+      }
+    });
+
+    // Add health events
+    healthEvents.whenData((List<HealthEvent> list) {
+      for (final HealthEvent e in list) {
+        items.add(_TimelineItem(
+          date: e.eventDate,
+          icon: Icons.favorite_rounded,
+          color: const Color(0xFFD32F2F),
+          title: e.eventType,
+          subtitle: e.result ?? e.notes ?? '',
         ));
       }
     });

@@ -16,7 +16,16 @@ import '../providers/scanner_provider.dart';
 class ScanInputSheet extends ConsumerWidget {
   final TagHandler tagHandler;
 
-  const ScanInputSheet({super.key, required this.tagHandler});
+  /// The BuildContext of the page that opened this sheet (HomeShell /
+  /// DashboardScreen). Must remain mounted after the sheet is dismissed so we
+  /// can show the tag-result sheets on top of the correct navigator.
+  final BuildContext outerContext;
+
+  const ScanInputSheet({
+    super.key,
+    required this.tagHandler,
+    required this.outerContext,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -116,9 +125,9 @@ class ScanInputSheet extends ConsumerWidget {
                     onTap: () async {
                       Navigator.pop(context);
                       final ScannerService svc = ref.read(scannerServiceProvider);
-                      final String? tag = await svc.scanWithCamera(context);
-                      if (tag != null && context.mounted) {
-                        await tagHandler.handleTag(tag, context);
+                      final String? tag = await svc.scanWithCamera(outerContext);
+                      if (tag != null && outerContext.mounted) {
+                        await tagHandler.handleTag(tag, outerContext);
                       }
                     },
                   ),
@@ -140,9 +149,9 @@ class ScanInputSheet extends ConsumerWidget {
                     onTap: () async {
                       Navigator.pop(context);
                       final ScannerService svc = ref.read(scannerServiceProvider);
-                      final String? tag = await svc.manualEntry(context);
-                      if (tag != null && context.mounted) {
-                        await tagHandler.handleTag(tag, context);
+                      final String? tag = await svc.manualEntry(outerContext);
+                      if (tag != null && outerContext.mounted) {
+                        await tagHandler.handleTag(tag, outerContext);
                       }
                     },
                   ),

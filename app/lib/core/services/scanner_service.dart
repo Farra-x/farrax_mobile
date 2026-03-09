@@ -96,6 +96,7 @@ class ScannerService {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      useRootNavigator: true,
       builder: (_) => const _CameraScanSheet(),
     );
   }
@@ -181,6 +182,7 @@ class _CameraScanSheetState extends State<_CameraScanSheet>
   final MobileScannerController _barcodeCtrl = MobileScannerController();
   bool _ocrProcessing = false;
   String? _ocrResult;
+  bool _hasPopped = false;
 
   // Latest frame captured by the OCR camera view
   Uint8List? _lastFrame;
@@ -204,11 +206,16 @@ class _CameraScanSheetState extends State<_CameraScanSheet>
 
     // Only auto-pop on barcode tab
     if (_tabs.index != 0) return;
+    if (_hasPopped) return;
     if (capture.barcodes.isEmpty) return;
     final String? raw = capture.barcodes.first.rawValue;
     if (raw == null) return;
     final String? tag = ScannerService().validateTag(raw);
-    if (tag != null && mounted) Navigator.pop(context, tag);
+    if (tag != null && mounted) {
+      _hasPopped = true;
+      _barcodeCtrl.stop();
+      Navigator.pop(context, tag);
+    }
   }
 
   Future<void> _captureOcr() async {

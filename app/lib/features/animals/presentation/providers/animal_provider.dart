@@ -69,6 +69,10 @@ Stream<List<Animal>> filteredAnimals(FilteredAnimalsRef ref) {
 Stream<List<Animal>> recentAnimals(RecentAnimalsRef ref) =>
     ref.watch(animalRepositoryProvider).watchRecentAnimals();
 
+@riverpod
+Stream<List<Animal>> allAnimals(AllAnimalsRef ref) =>
+    ref.watch(animalRepositoryProvider).watchAnimalsFiltered();
+
 // ─── Single Animal ────────────────────────────────────────────────────────────
 
 @riverpod
@@ -94,6 +98,16 @@ Stream<List<MedicineEvent>> animalMedicineEvents(
 Stream<List<DeathEvent>> animalDeathEvents(
         AnimalDeathEventsRef ref, String animalId) =>
     ref.watch(animalRepositoryProvider).watchDeathEvents(animalId);
+
+@riverpod
+Stream<List<TbTestEvent>> animalTbTestEvents(
+        AnimalTbTestEventsRef ref, String animalId) =>
+    ref.watch(animalRepositoryProvider).watchTbTestEvents(animalId);
+
+@riverpod
+Stream<List<HealthEvent>> animalHealthEvents(
+        AnimalHealthEventsRef ref, String animalId) =>
+    ref.watch(animalRepositoryProvider).watchHealthEvents(animalId);
 
 // ─── Dashboard Stats ──────────────────────────────────────────────────────────
 
