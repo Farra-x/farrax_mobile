@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -123,10 +124,14 @@ class _SplashScreenState extends State<SplashScreen>
                   opacity: _headOpacity.value,
                   child: Transform.scale(
                     scale: _headScale.value,
-                    child: const SizedBox(
-                      width: 180,
-                      height: 180,
-                      child: CustomPaint(painter: CattleHeadPainter()),
+                    child: SvgPicture.asset(
+                      'assets/icons/cattle.svg',
+                      width: 160,
+                      height: 160,
+                      colorFilter: const ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
                 ),
@@ -174,141 +179,4 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
   }
-}
-
-// ─── Cattle Head CustomPainter ────────────────────────────────────────────────
-
-class CattleHeadPainter extends CustomPainter {
-  const CattleHeadPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final double cx = size.width / 2;
-    final double cy = size.height / 2;
-    final double scale = size.width / 200.0;
-
-    final Paint white = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..strokeWidth = 3.5 * scale;
-
-    final Paint whiteFill = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-
-    final Paint amber = Paint()
-      ..color = const Color(0xFFF0A500)
-      ..style = PaintingStyle.fill;
-
-    final double s = scale;
-
-    // ── Head oval ─────────────────────────────────────────────────────────
-    canvas.drawOval(
-      Rect.fromCenter(
-          center: Offset(cx, cy - 5 * s), width: 110 * s, height: 130 * s),
-      white,
-    );
-
-    // ── Muzzle ────────────────────────────────────────────────────────────
-    final RRect muzzle = RRect.fromRectAndRadius(
-      Rect.fromCenter(
-          center: Offset(cx, cy + 42 * s), width: 70 * s, height: 36 * s),
-      Radius.circular(18 * s),
-    );
-    canvas.drawRRect(muzzle, white);
-
-    // Nostrils
-    canvas.drawOval(
-        Rect.fromCenter(
-            center: Offset(cx - 16 * s, cy + 46 * s),
-            width: 14 * s,
-            height: 10 * s),
-        white);
-    canvas.drawOval(
-        Rect.fromCenter(
-            center: Offset(cx + 16 * s, cy + 46 * s),
-            width: 14 * s,
-            height: 10 * s),
-        white);
-
-    // ── Eyes ──────────────────────────────────────────────────────────────
-    canvas.drawOval(
-        Rect.fromCenter(
-            center: Offset(cx - 28 * s, cy - 22 * s),
-            width: 22 * s,
-            height: 18 * s),
-        white);
-    canvas.drawCircle(Offset(cx - 28 * s, cy - 22 * s), 5 * s, whiteFill);
-
-    canvas.drawOval(
-        Rect.fromCenter(
-            center: Offset(cx + 28 * s, cy - 22 * s),
-            width: 22 * s,
-            height: 18 * s),
-        white);
-    canvas.drawCircle(Offset(cx + 28 * s, cy - 22 * s), 5 * s, whiteFill);
-
-    // ── Ears ──────────────────────────────────────────────────────────────
-    final Path leftEar = Path()
-      ..moveTo(cx - 55 * s, cy - 10 * s)
-      ..lineTo(cx - 90 * s, cy - 40 * s)
-      ..lineTo(cx - 72 * s, cy - 60 * s)
-      ..lineTo(cx - 50 * s, cy - 35 * s)
-      ..close();
-    canvas.drawPath(leftEar, white);
-
-    final Path rightEar = Path()
-      ..moveTo(cx + 55 * s, cy - 10 * s)
-      ..lineTo(cx + 90 * s, cy - 40 * s)
-      ..lineTo(cx + 72 * s, cy - 60 * s)
-      ..lineTo(cx + 50 * s, cy - 35 * s)
-      ..close();
-    canvas.drawPath(rightEar, white);
-
-    // ── Horns ─────────────────────────────────────────────────────────────
-    final Paint hornPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = 4 * scale;
-
-    final Path leftHorn = Path()
-      ..moveTo(cx - 42 * s, cy - 60 * s)
-      ..quadraticBezierTo(
-          cx - 65 * s, cy - 100 * s, cx - 38 * s, cy - 110 * s);
-    canvas.drawPath(leftHorn, hornPaint);
-
-    final Path rightHorn = Path()
-      ..moveTo(cx + 42 * s, cy - 60 * s)
-      ..quadraticBezierTo(
-          cx + 65 * s, cy - 100 * s, cx + 38 * s, cy - 110 * s);
-    canvas.drawPath(rightHorn, hornPaint);
-
-    // ── Ear tags (amber rectangles) ───────────────────────────────────────
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(
-            center: Offset(cx - 96 * s, cy - 42 * s),
-            width: 18 * s,
-            height: 12 * s),
-        Radius.circular(3 * s),
-      ),
-      amber,
-    );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(
-            center: Offset(cx + 96 * s, cy - 42 * s),
-            width: 18 * s,
-            height: 12 * s),
-        Radius.circular(3 * s),
-      ),
-      amber,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
