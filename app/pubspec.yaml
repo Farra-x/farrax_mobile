@@ -51,8 +51,20 @@ dependencies:
   cupertino_icons: ^1.0.6
   flutter_svg: ^2.0.10+1
 
+  # Notifications
+  flutter_local_notifications: ^17.2.3
+  timezone: ^0.9.4
+
+  # Reports & PDF
+  pdf: ^3.11.1
+  printing: ^5.13.1
+  share_plus: ^10.0.2
+  csv: ^6.0.0
+
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  integration_test:
     sdk: flutter
   flutter_lints: ^3.0.0
   build_runner: ^2.4.0
