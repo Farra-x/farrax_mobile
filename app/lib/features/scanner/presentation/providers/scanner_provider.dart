@@ -15,9 +15,10 @@ ScannerService scannerService(ScannerServiceRef ref) {
 }
 
 // ─── Connected Device Stream ──────────────────────────────────────────────────
-// Reacts whenever the scanner connects or disconnects a device.
+// keepAlive so it stays subscribed even when HomeShell is not in the tree
+// (e.g. while the user is on the BLE connect screen).
 
-@riverpod
+@Riverpod(keepAlive: true)
 Stream<BluetoothDevice?> connectedDevice(ConnectedDeviceRef ref) {
   return ref.watch(scannerServiceProvider).connectionStream;
 }
