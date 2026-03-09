@@ -9,12 +9,12 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:path_provider/path_provider.dart';
 
-// Nordic UART Service UUIDs
-const String _nuartServiceUuid = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
-const String _nuartTxCharUuid  = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+// Farrax ESP32 Super Mini UUIDs
+const String _farraxServiceUuid = '4fafc201-1fb5-459e-8fcc-c5c9c331914b';
+const String _farraxCharUuid    = 'beb5483e-36e1-4688-b7f5-ea07361b26a8';
 
 // Known reader device name fragments
-const List<String> _knownDeviceNames = ['Farrax', 'XRS2', 'HR5', 'AWR300'];
+const List<String> _knownDeviceNames = ['Farrax-Scanner', 'Farrax', 'XRS2', 'HR5', 'AWR300'];
 
 class ScannerService {
   final StreamController<String> _tagController =
@@ -60,7 +60,7 @@ class ScannerService {
     await disconnectDevice();
     await device.connect(timeout: const Duration(seconds: 10));
     _connectedDevice = device;
-    await _subscribeToNuart(device);
+    await _subscribeToFarraxChar(device);
   }
 
   Future<void> disconnectDevice() async {
@@ -70,15 +70,15 @@ class ScannerService {
     _connectedDevice = null;
   }
 
-  Future<void> _subscribeToNuart(BluetoothDevice device) async {
+  Future<void> _subscribeToFarraxChar(BluetoothDevice device) async {
     final List<BluetoothService> services = await device.discoverServices();
     for (final BluetoothService service in services) {
-      if (service.uuid.str128.toLowerCase() == _nuartServiceUuid) {
+      if (service.uuid.str128.toLowerCase() == _farraxServiceUuid) {
         for (final BluetoothCharacteristic char in service.characteristics) {
-          if (char.uuid.str128.toLowerCase() == _nuartTxCharUuid) {
+          if (char.uuid.str128.toLowerCase() == _farraxCharUuid) {
             await char.setNotifyValue(true);
             _txSubscription = char.onValueReceived.listen((List<int> value) {
-              final String raw = utf8.decode(value);
+              final String raw = utf8.decode(value).trim();
               final String? tag = validateTag(raw);
               if (tag != null) _tagController.add(tag);
             });

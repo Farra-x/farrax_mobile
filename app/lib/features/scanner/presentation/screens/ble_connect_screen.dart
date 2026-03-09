@@ -38,10 +38,10 @@ class _BleConnectScreenState extends ConsumerState<BleConnectScreen> {
       for (final ScanResult r in results) {
         final ScannerService svc = ref.read(scannerServiceProvider);
         final bool known = svc.isKnownDevice(r.device);
-        final bool hasNuart = r.advertisementData.serviceUuids
-            .any((guid) => guid.str128.toLowerCase().contains('6e400001'));
+        final bool hasFarraxService = r.advertisementData.serviceUuids
+            .any((guid) => guid.str128.toLowerCase().contains('4fafc201'));
 
-        if (known || hasNuart) {
+        if (known || hasFarraxService) {
           setState(() => _discovered[r.device.remoteId.str] = r.device);
         }
       }
@@ -49,7 +49,7 @@ class _BleConnectScreenState extends ConsumerState<BleConnectScreen> {
 
     await FlutterBluePlus.startScan(
       timeout: const Duration(seconds: 15),
-      withServices: [Guid('6E400001-B5A3-F393-E0A9-E50E24DCCA9E')],
+      withServices: [Guid('4fafc201-1fb5-459e-8fcc-c5c9c331914b')],
     );
 
     // Also scan without service filter to catch named devices
@@ -160,7 +160,7 @@ class _BleConnectScreenState extends ConsumerState<BleConnectScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
             child: Text(
-              'Looking for: Farrax, XRS2, HR5, AWR300 or any Nordic UART device',
+              'Looking for: Farrax-Scanner or any device with Farrax service UUID',
               style: TextStyle(fontSize: 12, color: Colors.grey[500]),
             ),
           ),
