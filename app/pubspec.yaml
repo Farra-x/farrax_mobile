@@ -55,6 +55,9 @@ dependencies:
   flutter_local_notifications: ^17.2.3
   timezone: ^0.9.4
 
+  # Splash
+  flutter_native_splash: ^2.4.1
+
   # Reports & PDF
   pdf: ^3.11.1
   printing: ^5.13.1
@@ -72,6 +75,26 @@ dev_dependencies:
   riverpod_generator: ^2.3.9
   json_serializable: ^6.7.0
   mocktail: ^1.0.0
+  flutter_launcher_icons: ^0.14.1
+
+flutter_native_splash:
+  color: "#1A7A3C"
+  color_dark: "#0D1F14"
+  image: assets/icons/splash_logo.png
+  image_dark: assets/icons/splash_logo.png
+  android_12:
+    color: "#1A7A3C"
+    image: assets/icons/splash_logo.png
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app_icon.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#1A7A3C"
+  adaptive_icon_foreground: "assets/icons/app_icon_foreground.png"
+  web:
+    generate: false
 
 flutter:
   uses-material-design: true

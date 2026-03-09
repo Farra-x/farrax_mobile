@@ -48,6 +48,9 @@ class AppTheme {
       filled: true,
       fillColor: Colors.white,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      labelStyle: const TextStyle(color: Color(0xFF444444), fontWeight: FontWeight.w500),
+      floatingLabelStyle: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600),
+      hintStyle: const TextStyle(color: Color(0xFF888888)),
     ),
     scaffoldBackgroundColor: AppColors.background,
   );

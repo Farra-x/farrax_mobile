@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/database/database.dart';
@@ -23,7 +24,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final TextEditingController _farmNameController = TextEditingController();
   final TextEditingController _herdNumberController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  String _selectedCountry = 'IE';
+  String _selectedCountry = 'Ireland';
 
   @override
   void dispose() {
@@ -55,6 +56,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
     await ref.read(farmRepositoryProvider).addFarm(farm);
     await ref.read(farmRepositoryProvider).setActiveFarm(farmId);
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('farm_setup_complete', true);
     if (mounted) context.go('/home');
   }
 
@@ -187,6 +190,50 @@ class _WelcomePage extends StatelessWidget {
 
 // ─── Page 2: Farm Setup ───────────────────────────────────────────────────────
 
+const List<String> _kCountries = [
+  'Ireland',
+  'United Kingdom',
+  'Australia',
+  'Austria',
+  'Belgium',
+  'Brazil',
+  'Canada',
+  'Chile',
+  'China',
+  'Czech Republic',
+  'Denmark',
+  'Finland',
+  'France',
+  'Germany',
+  'Greece',
+  'Hungary',
+  'India',
+  'Italy',
+  'Japan',
+  'Mexico',
+  'Netherlands',
+  'New Zealand',
+  'Norway',
+  'Poland',
+  'Portugal',
+  'Romania',
+  'Russia',
+  'South Africa',
+  'Spain',
+  'Sweden',
+  'Switzerland',
+  'Turkey',
+  'Ukraine',
+  'United States',
+  'Uruguay',
+];
+
+const TextStyle _fieldTextStyle = TextStyle(
+  fontSize: 15,
+  color: Color(0xFF1A1A1A),
+  fontWeight: FontWeight.w500,
+);
+
 class _FarmSetupPage extends StatelessWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController farmNameController;
@@ -233,6 +280,7 @@ class _FarmSetupPage extends StatelessWidget {
 
             TextFormField(
               controller: farmNameController,
+              style: _fieldTextStyle,
               decoration: const InputDecoration(
                 labelText: 'Farm Name',
                 hintText: 'e.g. Murphy Family Farm',
@@ -245,6 +293,7 @@ class _FarmSetupPage extends StatelessWidget {
 
             TextFormField(
               controller: herdNumberController,
+              style: _fieldTextStyle,
               decoration: const InputDecoration(
                 labelText: 'Herd Number',
                 hintText: 'e.g. IE141234',
@@ -256,37 +305,29 @@ class _FarmSetupPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Country toggle
-            const Text(
-              'Country',
-              style: TextStyle(
-                fontSize: 13,
-                color: Color(0xFF888888),
-                fontWeight: FontWeight.w500,
+            // Country dropdown
+            DropdownButtonFormField<String>(
+              initialValue: selectedCountry,
+              style: _fieldTextStyle,
+              decoration: const InputDecoration(
+                labelText: 'Country',
+                prefixIcon: Icon(Icons.public_rounded),
               ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                _CountryButton(
-                  label: 'IE',
-                  flag: '🇮🇪',
-                  isSelected: selectedCountry == 'IE',
-                  onTap: () => onCountryChanged('IE'),
-                ),
-                const SizedBox(width: 12),
-                _CountryButton(
-                  label: 'UK',
-                  flag: '🇬🇧',
-                  isSelected: selectedCountry == 'UK',
-                  onTap: () => onCountryChanged('UK'),
-                ),
-              ],
+              items: _kCountries.map((String country) {
+                return DropdownMenuItem<String>(
+                  value: country,
+                  child: Text(country),
+                );
+              }).toList(),
+              onChanged: (String? value) {
+                if (value != null) onCountryChanged(value);
+              },
             ),
             const SizedBox(height: 16),
 
             TextFormField(
               controller: addressController,
+              style: _fieldTextStyle,
               decoration: const InputDecoration(
                 labelText: 'Address (optional)',
                 hintText: 'Farm address',
@@ -314,53 +355,6 @@ class _FarmSetupPage extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CountryButton extends StatelessWidget {
-  final String label;
-  final String flag;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _CountryButton({
-    required this.label,
-    required this.flag,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? const Color(0xFF1A7A3C)
-                : const Color(0xFFEEEEEE),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(flag, style: const TextStyle(fontSize: 20)),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: isSelected ? Colors.white : const Color(0xFF333333),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

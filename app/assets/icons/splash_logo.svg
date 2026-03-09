@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <g transform="translate(200, 142)" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-58 -18 Q-60 -58 -28 -76 Q0 -86 28 -76 Q60 -58 58 -18 Q56 22 28 38 Q0 48 -28 38 Q-56 22 -58 -18Z" stroke-width="6"/>
+    <rect x="-34" y="16" width="68" height="38" rx="18" stroke-width="5"/>
+    <circle cx="-14" cy="38" r="7" stroke-width="4"/>
+    <circle cx="14" cy="38" r="7" stroke-width="4"/>
+    <circle cx="-28" cy="-26" r="11" stroke-width="5"/>
+    <circle cx="-28" cy="-26" r="4" fill="white" stroke="none"/>
+    <circle cx="28" cy="-26" r="11" stroke-width="5"/>
+    <circle cx="28" cy="-26" r="4" fill="white" stroke="none"/>
+    <path d="M-58 -18 Q-90 -24 -88 -52 Q-86 -72 -62 -62 Q-52 -58 -52 -40" stroke-width="5"/>
+    <path d="M58 -18 Q90 -24 88 -52 Q86 -72 62 -62 Q52 -58 52 -40" stroke-width="5"/>
+    <path d="M-44 -68 Q-60 -104 -38 -114 Q-22 -120 -20 -98" stroke-width="6"/>
+    <path d="M44 -68 Q60 -104 38 -114 Q22 -120 20 -98" stroke-width="6"/>
+    <rect x="-108" y="-40" width="20" height="13" rx="3" fill="#F0A500" stroke="none"/>
+    <rect x="88" y="-40" width="20" height="13" rx="3" fill="#F0A500" stroke="none"/>
+  </g>
+</svg>

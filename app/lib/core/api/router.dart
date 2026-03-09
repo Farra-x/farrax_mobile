@@ -5,6 +5,7 @@ import '../../features/animals/presentation/screens/add_animal_screen.dart';
 import '../../features/animals/presentation/screens/animal_detail_screen.dart';
 import '../../features/animals/presentation/screens/animals_screen.dart';
 import '../../features/auth/presentation/screens/welcome_screen.dart';
+import '../../features/splash/presentation/screens/splash_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/farms/presentation/screens/onboarding_screen.dart';
 import '../../features/health/presentation/screens/add_health_event_screen.dart';
@@ -24,6 +25,7 @@ import '../../shared/widgets/home_shell.dart';
 part 'router.g.dart';
 
 class AppRoutes {
+  static const splash = '/splash';
   static const welcome = '/';
   static const onboarding = '/onboarding';
   static const home = '/home';
@@ -38,9 +40,13 @@ class AppRoutes {
 @riverpod
 GoRouter appRouter(AppRouterRef ref) {
   return GoRouter(
-    initialLocation: AppRoutes.welcome,
+    initialLocation: AppRoutes.splash,
     debugLogDiagnostics: true,
     routes: [
+      GoRoute(
+        path: AppRoutes.splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(
         path: AppRoutes.welcome,
         builder: (context, state) => const WelcomeScreen(),
