@@ -40,6 +40,13 @@ class HomeShell extends ConsumerWidget {
     final int idx = _currentIndex(context);
     final String? connectedName = ref.watch(connectedDeviceNameProvider);
 
+    // Listen for BLE tag notifications and handle them immediately
+    ref.listen(bleTagStreamProvider, (_, AsyncValue<String> next) {
+      next.whenData((String tag) {
+        ref.read(tagHandlerProvider).handleTag(tag, context);
+      });
+    });
+
     return Scaffold(
       body: child,
       bottomNavigationBar: NavigationBar(

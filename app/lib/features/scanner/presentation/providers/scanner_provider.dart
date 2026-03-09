@@ -14,6 +14,14 @@ ScannerService scannerService(ScannerServiceRef ref) {
   return svc;
 }
 
+// ─── BLE Tag Stream ───────────────────────────────────────────────────────────
+// keepAlive so it never misses a tag notification, even off the home screen.
+
+@Riverpod(keepAlive: true)
+Stream<String> bleTagStream(BleTagStreamRef ref) {
+  return ref.watch(scannerServiceProvider).tagStream;
+}
+
 // ─── Connected Device Stream ──────────────────────────────────────────────────
 // keepAlive so it stays subscribed even when HomeShell is not in the tree
 // (e.g. while the user is on the BLE connect screen).
