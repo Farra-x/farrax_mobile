@@ -14,12 +14,20 @@ ScannerService scannerService(ScannerServiceRef ref) {
   return svc;
 }
 
+// ─── Connected Device Stream ──────────────────────────────────────────────────
+// Reacts whenever the scanner connects or disconnects a device.
+
+@riverpod
+Stream<BluetoothDevice?> connectedDevice(ConnectedDeviceRef ref) {
+  return ref.watch(scannerServiceProvider).connectionStream;
+}
+
 // ─── BLE Connection State ─────────────────────────────────────────────────────
 
 @riverpod
 Stream<BluetoothConnectionState> bleConnectionState(BleConnectionStateRef ref) {
   final BluetoothDevice? device =
-      ref.watch(scannerServiceProvider).connectedDevice;
+      ref.watch(connectedDeviceProvider).valueOrNull;
   if (device == null) {
     return Stream.value(BluetoothConnectionState.disconnected);
   }
@@ -31,7 +39,7 @@ Stream<BluetoothConnectionState> bleConnectionState(BleConnectionStateRef ref) {
 @riverpod
 String? connectedDeviceName(ConnectedDeviceNameRef ref) {
   final BluetoothDevice? device =
-      ref.watch(scannerServiceProvider).connectedDevice;
+      ref.watch(connectedDeviceProvider).valueOrNull;
   if (device == null) return null;
   final String name = device.platformName;
   return name.isNotEmpty ? name : device.remoteId.str;

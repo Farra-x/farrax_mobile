@@ -20,7 +20,13 @@ class ScannerService {
   final StreamController<String> _tagController =
       StreamController<String>.broadcast();
 
+  final StreamController<BluetoothDevice?> _connectionController =
+      StreamController<BluetoothDevice?>.broadcast();
+
   Stream<String> get tagStream => _tagController.stream;
+
+  /// Emits the connected device on connect, null on disconnect.
+  Stream<BluetoothDevice?> get connectionStream => _connectionController.stream;
 
   BluetoothDevice? _connectedDevice;
   StreamSubscription<List<int>>? _txSubscription;
@@ -60,6 +66,7 @@ class ScannerService {
     await disconnectDevice();
     await device.connect(timeout: const Duration(seconds: 10));
     _connectedDevice = device;
+    _connectionController.add(device);
     await _subscribeToFarraxChar(device);
   }
 
@@ -68,6 +75,7 @@ class ScannerService {
     _txSubscription = null;
     await _connectedDevice?.disconnect();
     _connectedDevice = null;
+    _connectionController.add(null);
   }
 
   Future<void> _subscribeToFarraxChar(BluetoothDevice device) async {
@@ -164,6 +172,7 @@ class ScannerService {
   void dispose() {
     disconnectDevice();
     _tagController.close();
+    _connectionController.close();
   }
 }
 
