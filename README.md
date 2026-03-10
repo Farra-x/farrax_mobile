@@ -1,49 +1,27 @@
-# 🐄 Farrax — Cattle Management App
+# 🐄 Farrax Mobile
 
-> Smart herd management for Irish & UK farmers. Built with Flutter + FastAPI.
+> Flutter cattle management app for Irish & UK farmers.
 
 [![Flutter CI](https://github.com/Farra-x/farrax_mobile/actions/workflows/flutter_ci.yml/badge.svg)](https://github.com/Farra-x/farrax_mobile/actions)
-[![Server CI](https://github.com/Farra-x/farrax_mobile/actions/workflows/server_ci.yml/badge.svg)](https://github.com/Farra-x/farrax_mobile/actions)
 
-## 📁 Project Structure
+**Server repo:** https://github.com/Farra-x/farrax_server
 
-```
-farrax/
-├── app/          # Flutter Android app
-├── server/       # Python FastAPI backend
-├── docs/         # Documentation
-└── .github/      # CI/CD workflows
-```
-
-## 🚀 Quick Start
-
-### Flutter App
+## Quick Start
 ```bash
-cd app
 flutter pub get
+dart run build_runner build --delete-conflicting-outputs
 flutter run
 ```
 
-### Python Server
-```bash
-cd server
-python -m venv venv
-venv\Scripts\activate      # Windows
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-```
+## Stack
+- Flutter + Dart (Android first)
+- Riverpod (state), Drift/SQLite (offline), Dio (HTTP), go_router (nav)
 
-## 🔗 Key Links
-- API Docs: http://localhost:8000/docs
-- ICBF: https://www.icbf.com
-- DAFM AIM: https://agfood.agriculture.gov.ie
-
-## 📋 Features (MVP)
-- [x] Project setup
+## MVP Features
 - [ ] EID Tag Scanning
-- [ ] Calf Registration
-- [ ] Dam-Sire Parentage- [ ] Birth / Death / Movement Records
-- [ ] Medicine Cabinet
+- [ ] Calf Registration (IE/UK tag format)
+- [ ] Dam-Sire Parentage Linking
+- [ ] Birth / Death / Movement Records
+- [ ] Medicine Cabinet + Withdrawal Tracking
 - [ ] TB Test Recording
-- [ ] Withdrawal Period Tracking
 - [ ] ICBF / AIM Integration

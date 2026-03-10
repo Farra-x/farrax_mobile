@@ -1,0 +1,105 @@
+name: farrax
+description: Smart cattle herd management for Irish & UK farmers.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+
+  # Navigation
+  go_router: ^13.2.0
+
+  # Local Database (Offline-first)
+  drift: ^2.18.0
+  sqlite3_flutter_libs: ^0.5.0
+  path_provider: ^2.1.0
+  path: ^1.9.0
+
+  # HTTP Client
+  dio: ^5.4.0
+
+  # Secure Storage (for JWT tokens)
+  flutter_secure_storage: ^9.0.0
+
+  # EID / Bluetooth & Scanner
+  flutter_blue_plus: ^1.31.15
+  mobile_scanner: ^5.2.3
+  google_mlkit_text_recognition: ^0.13.1
+  permission_handler: ^11.3.1
+
+  # UI & Utilities
+  intl: 0.20.2
+  uuid: ^4.3.0
+  logger: ^2.2.0
+  connectivity_plus: ^6.0.0
+  shared_preferences: ^2.2.0
+  cached_network_image: ^3.3.0
+  shimmer: ^3.0.0
+
+  # Forms & Validation
+  reactive_forms: ^17.0.0
+
+  # Icons
+  cupertino_icons: ^1.0.6
+  flutter_svg: ^2.0.10+1
+
+  # Notifications
+  flutter_local_notifications: ^17.2.3
+  timezone: ^0.9.4
+
+  # Splash
+  flutter_native_splash: ^2.4.1
+
+  # Reports & PDF
+  pdf: ^3.11.1
+  printing: ^5.13.1
+  share_plus: ^10.0.2
+  csv: ^6.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  build_runner: ^2.4.0
+  drift_dev: ^2.18.0
+  riverpod_generator: ^2.3.9
+  json_serializable: ^6.7.0
+  mocktail: ^1.0.0
+  flutter_launcher_icons: ^0.14.1
+
+flutter_native_splash:
+  color: "#1A7A3C"
+  color_dark: "#0D1F14"
+  image: assets/icons/app_icon.png
+  image_dark: assets/icons/app_icon.png
+  android_12:
+    color: "#1A7A3C"
+    image: assets/icons/app_icon.png
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app_icon.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#1A7A3C"
+  adaptive_icon_foreground: "assets/icons/app_icon_foreground.png"
+  web:
+    generate: false
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/
