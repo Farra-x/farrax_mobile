@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/l10n/app_l10n.dart';
+import '../../core/providers/locale_provider.dart';
 import '../../features/animals/presentation/providers/animal_provider.dart';
 import '../../features/scanner/presentation/providers/scanner_provider.dart';
 import '../../features/scanner/presentation/widgets/scan_input_sheet.dart';
@@ -39,6 +41,7 @@ class HomeShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final int idx = _currentIndex(context);
     final String? connectedName = ref.watch(connectedDeviceNameProvider);
+    final AppL10n l10n = AppL10n(ref.watch(appLocaleProvider));
 
     // Trigger auto-reconnect once on startup
     ref.watch(bleAutoReconnectProvider);
@@ -64,27 +67,27 @@ class HomeShell extends ConsumerWidget {
         backgroundColor: Colors.white,
         indicatorColor: const Color(0xFF1A7A3C).withValues(alpha: 0.12),
         destinations: [
-          const NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home_rounded, color: Color(0xFF1A7A3C)),
-            label: 'Home',
+          NavigationDestination(
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home_rounded, color: Color(0xFF1A7A3C)),
+            label: l10n.navHome,
           ),
-          const NavigationDestination(
-            icon: Icon(Icons.pets_outlined),
-            selectedIcon: Icon(Icons.pets_rounded, color: Color(0xFF1A7A3C)),
-            label: 'Herd',
+          NavigationDestination(
+            icon: const Icon(Icons.pets_outlined),
+            selectedIcon: const Icon(Icons.pets_rounded, color: Color(0xFF1A7A3C)),
+            label: l10n.navHerd,
           ),
-          const NavigationDestination(
-            icon: Icon(Icons.medical_services_outlined),
-            selectedIcon: Icon(Icons.medical_services_rounded,
+          NavigationDestination(
+            icon: const Icon(Icons.medical_services_outlined),
+            selectedIcon: const Icon(Icons.medical_services_rounded,
                 color: Color(0xFF1A7A3C)),
-            label: 'Health',
+            label: l10n.navHealth,
           ),
-          const NavigationDestination(
-            icon: Icon(Icons.swap_horiz_outlined),
-            selectedIcon:
-                Icon(Icons.swap_horiz_rounded, color: Color(0xFF1A7A3C)),
-            label: 'Movements',
+          NavigationDestination(
+            icon: const Icon(Icons.swap_horiz_outlined),
+            selectedIcon: const Icon(Icons.swap_horiz_rounded,
+                color: Color(0xFF1A7A3C)),
+            label: l10n.navMovements,
           ),
           NavigationDestination(
             icon: Stack(
@@ -104,7 +107,7 @@ class HomeShell extends ConsumerWidget {
                   ),
               ],
             ),
-            label: 'Scanner',
+            label: l10n.navScanner,
           ),
         ],
       ),

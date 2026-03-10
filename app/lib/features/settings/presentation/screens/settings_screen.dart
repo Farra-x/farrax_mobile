@@ -4,7 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/database/database.dart';
-import '../../../../core/providers/theme_provider.dart';
+import '../../../../core/l10n/app_l10n.dart';
+import '../../../../core/providers/locale_provider.dart';
 import '../../../farms/presentation/providers/farm_provider.dart';
 import '../../../scanner/presentation/providers/scanner_provider.dart';
 
@@ -14,13 +15,14 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final AsyncValue<Farm?> farmAsync = ref.watch(activeFarmProvider);
-    final ThemeMode themeMode = ref.watch(themeMode_Provider);
     final String? connectedName = ref.watch(connectedDeviceNameProvider);
+    final Locale locale = ref.watch(appLocaleProvider);
+    final AppL10n l10n = AppL10n(locale);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7F5),
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(l10n.settings),
         backgroundColor: const Color(0xFF1A7A3C),
         foregroundColor: Colors.white,
       ),
@@ -28,7 +30,7 @@ class SettingsScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         children: [
           // ── Farm Profile ─────────────────────────────────────────────
-          const _SectionTitle('Farm Profile'),
+          _SectionTitle(l10n.farmProfile),
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
@@ -45,21 +47,21 @@ class SettingsScreen extends ConsumerWidget {
                   ListTile(
                     leading: const Icon(Icons.home_rounded,
                         color: Color(0xFF1A7A3C)),
-                    title: Text(farm?.name ?? 'No farm set up'),
+                    title: Text(farm?.name ?? l10n.noFarmSetUp),
                     subtitle: farm != null
                         ? Text('${farm.herdNumber} · ${farm.country}')
                         : null,
                     trailing: TextButton(
                       onPressed: () =>
                           context.push('/settings/farm/edit'),
-                      child: const Text('Edit'),
+                      child: Text(l10n.edit),
                     ),
                   ),
                   const Divider(height: 1),
                   ListTile(
                     leading: const Icon(Icons.add_rounded,
                         color: Color(0xFF1A7A3C)),
-                    title: const Text('Add New Farm'),
+                    title: Text(l10n.addNewFarm),
                     onTap: () => context.push('/onboarding'),
                   ),
                 ],
@@ -69,33 +71,23 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 20),
 
           // ── Preferences ─────────────────────────────────────────────
-          const _SectionTitle('Preferences'),
+          _SectionTitle(l10n.preferences),
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14)),
             child: Column(
               children: [
-                SwitchListTile(
-                  secondary: const Icon(Icons.dark_mode_rounded),
-                  title: const Text('Dark Mode'),
-                  value: themeMode == ThemeMode.dark,
-                  onChanged: (bool v) => ref
-                      .read(themeMode_Provider.notifier)
-                      .setMode(v ? ThemeMode.dark : ThemeMode.light),
-                ),
-                const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.straighten_rounded),
-                  title: const Text('Units'),
+                  title: Text(l10n.units),
                   trailing: _UnitsToggle(),
                 ),
                 const Divider(height: 1),
-                const ListTile(
-                  leading: Icon(Icons.language_rounded),
-                  title: Text('Language'),
-                  trailing: Text('English',
-                      style: TextStyle(color: Color(0xFF888888))),
+                ListTile(
+                  leading: const Icon(Icons.language_rounded),
+                  title: Text(l10n.language),
+                  trailing: _LanguageToggle(locale: locale, ref: ref),
                 ),
               ],
             ),
@@ -103,7 +95,7 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 20),
 
           // ── Scanner ─────────────────────────────────────────────────
-          const _SectionTitle('Scanner'),
+          _SectionTitle(l10n.scanner),
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
@@ -113,8 +105,8 @@ class SettingsScreen extends ConsumerWidget {
                 ListTile(
                   leading: const Icon(Icons.bluetooth_rounded,
                       color: Color(0xFF1A7A3C)),
-                  title: Text(connectedName ?? 'Not connected'),
-                  subtitle: const Text('EID Reader'),
+                  title: Text(connectedName ?? l10n.notConnected),
+                  subtitle: Text(l10n.eidReader),
                   trailing: connectedName != null
                       ? TextButton(
                           onPressed: () => ref
@@ -122,12 +114,12 @@ class SettingsScreen extends ConsumerWidget {
                               .disconnectDevice(),
                           style: TextButton.styleFrom(
                               foregroundColor: Colors.red),
-                          child: const Text('Disconnect'),
+                          child: Text(l10n.disconnect),
                         )
                       : TextButton(
                           onPressed: () =>
                               context.push('/scanner/ble'),
-                          child: const Text('Connect'),
+                          child: Text(l10n.connect),
                         ),
                 ),
               ],
@@ -136,18 +128,18 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 20),
 
           // ── About ────────────────────────────────────────────────────
-          const _SectionTitle('About'),
+          _SectionTitle(l10n.about),
           Card(
             elevation: 0,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14)),
             child: Column(
               children: [
-                const ListTile(
-                  leading: Icon(Icons.info_rounded,
+                ListTile(
+                  leading: const Icon(Icons.info_rounded,
                       color: Color(0xFF1A7A3C)),
-                  title: Text('Version'),
-                  trailing: Text('1.0.0 (Beta)',
+                  title: Text(l10n.version),
+                  trailing: const Text('1.0.0 (Beta)',
                       style: TextStyle(color: Color(0xFF888888))),
                 ),
                 const Divider(height: 1),
@@ -162,7 +154,7 @@ class SettingsScreen extends ConsumerWidget {
                 ListTile(
                   leading: const Icon(Icons.privacy_tip_rounded,
                       color: Color(0xFF1A7A3C)),
-                  title: const Text('Privacy Policy'),
+                  title: Text(l10n.privacyPolicy),
                   onTap: () {},
                 ),
               ],
@@ -195,6 +187,69 @@ class _SectionTitle extends StatelessWidget {
     );
   }
 }
+
+// ─── Language Toggle ──────────────────────────────────────────────────────────
+
+class _LanguageToggle extends StatelessWidget {
+  final Locale locale;
+  final WidgetRef ref;
+  const _LanguageToggle({required this.locale, required this.ref});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _LangChip(
+          label: AppL10n.english,
+          selected: locale.languageCode == 'en',
+          onTap: () => ref
+              .read(appLocaleProvider.notifier)
+              .setLocale(const Locale('en')),
+        ),
+        const SizedBox(width: 4),
+        _LangChip(
+          label: AppL10n.gaeilge,
+          selected: locale.languageCode == 'ga',
+          onTap: () => ref
+              .read(appLocaleProvider.notifier)
+              .setLocale(const Locale('ga')),
+        ),
+      ],
+    );
+  }
+}
+
+class _LangChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  const _LangChip({required this.label, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: selected ? const Color(0xFF1A7A3C) : const Color(0xFFEEEEEE),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: selected ? Colors.white : const Color(0xFF555555),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Units Toggle ─────────────────────────────────────────────────────────────
 
 class _UnitsToggle extends ConsumerStatefulWidget {
   @override

@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/database/database.dart';
+import '../../../../core/l10n/app_l10n.dart';
+import '../../../../core/providers/locale_provider.dart';
 import '../providers/movement_provider.dart';
 
 class MovementsScreen extends ConsumerWidget {
@@ -15,11 +17,12 @@ class MovementsScreen extends ConsumerWidget {
         ref.watch(movementsFilterNotifierProvider);
     final AsyncValue<List<MovementEvent>> movementsAsync =
         ref.watch(filteredMovementsProvider);
+    final AppL10n l10n = AppL10n(ref.watch(appLocaleProvider));
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7F5),
       appBar: AppBar(
-        title: const Text('Movements'),
+        title: Text(l10n.navMovements),
         backgroundColor: const Color(0xFF1A7A3C),
         foregroundColor: Colors.white,
       ),
@@ -40,7 +43,7 @@ class MovementsScreen extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               children: [
                 _FilterChip(
-                  label: 'All',
+                  label: l10n.filterAll,
                   isSelected: filter == MovementsFilter.all,
                   onTap: () => ref
                       .read(movementsFilterNotifierProvider.notifier)
@@ -48,7 +51,7 @@ class MovementsScreen extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 _FilterChip(
-                  label: 'In',
+                  label: l10n.filterIn,
                   isSelected: filter == MovementsFilter.inbound,
                   onTap: () => ref
                       .read(movementsFilterNotifierProvider.notifier)
@@ -57,7 +60,7 @@ class MovementsScreen extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 _FilterChip(
-                  label: 'Out',
+                  label: l10n.filterOut,
                   isSelected: filter == MovementsFilter.outbound,
                   onTap: () => ref
                       .read(movementsFilterNotifierProvider.notifier)
@@ -66,7 +69,7 @@ class MovementsScreen extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 _FilterChip(
-                  label: 'This Month',
+                  label: l10n.thisMonth,
                   isSelected: filter == MovementsFilter.thisMonth,
                   onTap: () => ref
                       .read(movementsFilterNotifierProvider.notifier)
@@ -92,9 +95,9 @@ class MovementsScreen extends ConsumerWidget {
                         Icon(Icons.swap_horiz_rounded,
                             size: 64, color: Colors.grey[300]),
                         const SizedBox(height: 16),
-                        const Text(
-                          'No movements recorded',
-                          style: TextStyle(
+                        Text(
+                          l10n.noMovementsYet,
+                          style: const TextStyle(
                               color: Color(0xFF888888), fontSize: 16),
                         ),
                         const SizedBox(height: 8),
@@ -104,7 +107,7 @@ class MovementsScreen extends ConsumerWidget {
                             backgroundColor: const Color(0xFF1A7A3C),
                             foregroundColor: Colors.white,
                           ),
-                          child: const Text('Record Movement'),
+                          child: Text(l10n.recordMovement),
                         ),
                       ],
                     ),
@@ -166,12 +169,13 @@ class _FilterChip extends StatelessWidget {
   }
 }
 
-class _MovementTile extends StatelessWidget {
+class _MovementTile extends ConsumerWidget {
   final MovementEvent movement;
   const _MovementTile({required this.movement});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppL10n l10n = AppL10n(ref.watch(appLocaleProvider));
     final bool isIn = movement.movementType == 'in';
     final Color badgeColor =
         isIn ? const Color(0xFF1A7A3C) : const Color(0xFFF0A500);
@@ -236,7 +240,7 @@ class _MovementTile extends StatelessWidget {
                 Text(
                   movement.destinationFarmName ??
                       movement.originFarmName ??
-                      'Unknown farm',
+                      l10n.unknownFarm,
                   style: const TextStyle(
                       fontSize: 12, color: Color(0xFF888888)),
                 ),

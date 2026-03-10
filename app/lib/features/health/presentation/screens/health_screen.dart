@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/database/database.dart';
+import '../../../../core/l10n/app_l10n.dart';
+import '../../../../core/providers/locale_provider.dart';
 import '../providers/health_provider.dart';
 
 class HealthScreen extends ConsumerWidget {
@@ -11,23 +13,24 @@ class HealthScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final AppL10n l10n = AppL10n(ref.watch(appLocaleProvider));
     return DefaultTabController(
       length: 4,
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F7F5),
         appBar: AppBar(
-          title: const Text('Health'),
+          title: Text(l10n.navHealth),
           backgroundColor: const Color(0xFF1A7A3C),
           foregroundColor: Colors.white,
-          bottom: const TabBar(
+          bottom: TabBar(
             labelColor: Colors.white,
-            unselectedLabelColor: Color(0xCCFFFFFF),
+            unselectedLabelColor: const Color(0xCCFFFFFF),
             indicatorColor: Colors.white,
             tabs: [
-              Tab(text: 'Overview'),
-              Tab(text: 'Cabinet'),
-              Tab(text: 'TB Tests'),
-              Tab(text: 'Alerts'),
+              Tab(text: l10n.overview),
+              Tab(text: l10n.cabinetTab),
+              Tab(text: l10n.tbTests),
+              Tab(text: l10n.alertsTab),
             ],
           ),
         ),
@@ -58,11 +61,12 @@ class _OverviewTab extends ConsumerWidget {
       error: (Object e, _) => Center(child: Text('Error: $e')),
       data: (List<HealthEvent> events) {
         if (events.isEmpty) {
+          final AppL10n l10n = AppL10n(ref.watch(appLocaleProvider));
           return _EmptyState(
             icon: Icons.favorite_rounded,
-            message: 'No health events recorded',
+            message: l10n.noHealthEvents,
             onAdd: () => context.push('/health/event/add'),
-            addLabel: 'Add Health Event',
+            addLabel: l10n.addHealthEvent,
           );
         }
         return ListView.separated(
@@ -153,11 +157,12 @@ class _MedicineCabinetTab extends ConsumerWidget {
         error: (Object e, _) => Center(child: Text('Error: $e')),
         data: (List<MedicineCabinetItem> items) {
           if (items.isEmpty) {
+            final AppL10n l10n = AppL10n(ref.watch(appLocaleProvider));
             return _EmptyState(
               icon: Icons.medication_rounded,
-              message: 'Medicine cabinet is empty',
+              message: l10n.cabinetEmpty,
               onAdd: () => context.push('/health/medicine/add'),
-              addLabel: 'Add Medicine',
+              addLabel: l10n.addMedicine,
             );
           }
           return ListView.separated(
@@ -172,12 +177,13 @@ class _MedicineCabinetTab extends ConsumerWidget {
   }
 }
 
-class _CabinetTile extends StatelessWidget {
+class _CabinetTile extends ConsumerWidget {
   final MedicineCabinetItem item;
   const _CabinetTile({required this.item});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppL10n l10n = AppL10n(ref.watch(appLocaleProvider));
     final bool isLowStock = item.lowStockThreshold != null &&
         item.stockUnits != null &&
         item.stockUnits! <= item.lowStockThreshold!;
@@ -229,9 +235,9 @@ class _CabinetTile extends StatelessWidget {
                           color: Colors.orange,
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: const Text(
-                          'Low Stock',
-                          style: TextStyle(
+                        child: Text(
+                          l10n.lowStock,
+                          style: const TextStyle(
                               color: Colors.white,
                               fontSize: 10,
                               fontWeight: FontWeight.w600),
@@ -278,11 +284,12 @@ class _TbTestingTab extends ConsumerWidget {
         error: (Object e, _) => Center(child: Text('Error: $e')),
         data: (List<TbTestEvent> tests) {
           if (tests.isEmpty) {
+            final AppL10n l10n = AppL10n(ref.watch(appLocaleProvider));
             return _EmptyState(
               icon: Icons.biotech_rounded,
-              message: 'No TB tests recorded',
+              message: l10n.noTbTests,
               onAdd: () => context.push('/health/tb/add'),
-              addLabel: 'Add TB Test',
+              addLabel: l10n.addTbTest,
             );
           }
           return ListView.separated(
@@ -397,9 +404,10 @@ class _AlertsTab extends ConsumerWidget {
       error: (Object e, _) => Center(child: Text('Error: $e')),
       data: (List<AppNotification> notifications) {
         if (notifications.isEmpty) {
-          return const _EmptyState(
+          final AppL10n l10n = AppL10n(ref.watch(appLocaleProvider));
+          return _EmptyState(
             icon: Icons.notifications_none_rounded,
-            message: 'No unread alerts',
+            message: l10n.noUnreadAlerts,
           );
         }
         return ListView.separated(

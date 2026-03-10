@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/database/database.dart';
 import '../providers/animal_provider.dart';
 import '../../../scanner/presentation/widgets/scan_input_sheet.dart';
+import '../../../../core/l10n/app_l10n.dart';
+import '../../../../core/providers/locale_provider.dart';
 
 class AnimalsScreen extends ConsumerStatefulWidget {
   const AnimalsScreen({super.key});
@@ -39,6 +41,7 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
     final AsyncValue<List<Animal>> animalsAsync =
         ref.watch(filteredAnimalsProvider);
     final AnimalFilterOption filter = ref.watch(animalListFilterProvider);
+    final AppL10n l10n = AppL10n(ref.watch(appLocaleProvider));
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7F5),
@@ -46,9 +49,9 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
         backgroundColor: const Color(0xFF1A7A3C),
         foregroundColor: Colors.white,
         elevation: 0,
-        title: const Text(
-          'My Herd',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        title: Text(
+          l10n.myHerd,
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         actions: [
           IconButton(
@@ -70,7 +73,7 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
                   ref.read(animalSearchQueryProvider.notifier).set(v),
               style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
-                hintText: 'Search by tag or breed…',
+                hintText: l10n.searchHint,
                 hintStyle:
                     const TextStyle(color: Color(0xAAFFFFFF), fontSize: 14),
                 prefixIcon: const Icon(Icons.search_rounded,
@@ -109,10 +112,10 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
                 children: AnimalFilterOption.values.map((AnimalFilterOption f) {
                   final bool selected = filter == f;
                   final String label = switch (f) {
-                    AnimalFilterOption.all => 'All',
-                    AnimalFilterOption.active => 'Active',
-                    AnimalFilterOption.male => 'Male',
-                    AnimalFilterOption.female => 'Female',
+                    AnimalFilterOption.all => l10n.filterAll,
+                    AnimalFilterOption.active => l10n.active,
+                    AnimalFilterOption.male => l10n.male,
+                    AnimalFilterOption.female => l10n.female,
                   };
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
@@ -155,7 +158,12 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
               ),
               error: (Object e, _) => Center(child: Text('Error: $e')),
               data: (List<Animal> animals) => animals.isEmpty
-                  ? _EmptyState(onAdd: () => context.push('/animals/add'))
+                  ? _EmptyState(
+                      onAdd: () => context.push('/animals/add'),
+                      message: l10n.noAnimalsYet,
+                      hint: l10n.tapBelowToRegister,
+                      buttonLabel: l10n.registerFirstAnimal,
+                    )
                   : RefreshIndicator(
                       color: const Color(0xFF1A7A3C),
                       onRefresh: () async =>
@@ -184,9 +192,9 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
         backgroundColor: const Color(0xFF1A7A3C),
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add_rounded),
-        label: const Text(
-          'Add Animal',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        label: Text(
+          l10n.addAnimal,
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
       ),
     );
@@ -197,7 +205,15 @@ class _AnimalsScreenState extends ConsumerState<AnimalsScreen> {
 
 class _EmptyState extends StatelessWidget {
   final VoidCallback onAdd;
-  const _EmptyState({required this.onAdd});
+  final String message;
+  final String hint;
+  final String buttonLabel;
+  const _EmptyState({
+    required this.onAdd,
+    required this.message,
+    required this.hint,
+    required this.buttonLabel,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -209,19 +225,19 @@ class _EmptyState extends StatelessWidget {
           children: [
             Icon(Icons.pets_rounded, size: 64, color: Colors.grey[300]),
             const SizedBox(height: 16),
-            const Text(
-              'No animals registered yet',
-              style: TextStyle(
+            Text(
+              message,
+              style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF555555),
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Tap the button below to register\nyour first animal.',
+            Text(
+              hint,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13, color: Color(0xFF999999)),
+              style: const TextStyle(fontSize: 13, color: Color(0xFF999999)),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
@@ -235,9 +251,9 @@ class _EmptyState extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12)),
               ),
               icon: const Icon(Icons.add_rounded),
-              label: const Text(
-                'Register First Animal',
-                style: TextStyle(fontWeight: FontWeight.w700),
+              label: Text(
+                buttonLabel,
+                style: const TextStyle(fontWeight: FontWeight.w700),
               ),
             ),
           ],
@@ -249,7 +265,7 @@ class _EmptyState extends StatelessWidget {
 
 // ─── Animal Tile ──────────────────────────────────────────────────────────────
 
-class _AnimalTile extends StatelessWidget {
+class _AnimalTile extends ConsumerWidget {
   final Animal animal;
   final VoidCallback onTap;
 
@@ -265,7 +281,8 @@ class _AnimalTile extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppL10n l10n = AppL10n(ref.watch(appLocaleProvider));
     return Material(
       color: Colors.white,
       borderRadius: BorderRadius.circular(14),
@@ -310,7 +327,7 @@ class _AnimalTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${animal.breed} · ${animal.sex == 'M' ? 'Male' : 'Female'} · ${_age(animal.dateOfBirth)}',
+                      '${animal.breed} · ${animal.sex == 'M' ? l10n.male : l10n.female} · ${_age(animal.dateOfBirth)}',
                       style: const TextStyle(
                         fontSize: 12,
                         color: Color(0xFF888888),
@@ -331,7 +348,7 @@ class _AnimalTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  animal.isActive ? 'Active' : 'Inactive',
+                  animal.isActive ? l10n.active : l10n.inactive,
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,

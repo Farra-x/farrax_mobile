@@ -23,6 +23,13 @@ class AppTheme {
       secondary: AppColors.accent,
       surface: AppColors.surface,
       error: AppColors.error,
+      onSurface: AppColors.textPrimary,       // input text colour
+      onSurfaceVariant: const Color(0xFF444444), // label text colour
+    ),
+    textTheme: const TextTheme(
+      bodyLarge: TextStyle(color: AppColors.textPrimary),
+      bodyMedium: TextStyle(color: AppColors.textPrimary),
+      bodySmall: TextStyle(color: Color(0xFF333333)),
     ),
     appBarTheme: const AppBarTheme(
       backgroundColor: AppColors.primary,
