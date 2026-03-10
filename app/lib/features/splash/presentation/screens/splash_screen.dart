@@ -117,20 +117,19 @@ class _SplashScreenState extends State<SplashScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Cattle head
+              // Farrax F icon
               AnimatedBuilder(
                 animation: _headCtrl,
                 builder: (_, __) => Opacity(
                   opacity: _headOpacity.value,
                   child: Transform.scale(
                     scale: _headScale.value,
-                    child: SvgPicture.asset(
-                      'assets/icons/cattle.svg',
-                      width: 160,
-                      height: 160,
-                      colorFilter: const ColorFilter.mode(
-                        Colors.white,
-                        BlendMode.srcIn,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(32),
+                      child: SvgPicture.asset(
+                        'assets/icons/app_icon.svg',
+                        width: 140,
+                        height: 140,
                       ),
                     ),
                   ),

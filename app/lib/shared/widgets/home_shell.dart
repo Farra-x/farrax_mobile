@@ -40,24 +40,13 @@ class HomeShell extends ConsumerWidget {
     final int idx = _currentIndex(context);
     final String? connectedName = ref.watch(connectedDeviceNameProvider);
 
+    // Trigger auto-reconnect once on startup
+    ref.watch(bleAutoReconnectProvider);
+
     // Listen for BLE tag notifications and handle them immediately
     ref.listen(bleTagStreamProvider, (_, AsyncValue<String> next) {
       next.whenData((String tag) {
         ref.read(tagHandlerProvider).handleTag(tag, context);
-      });
-    });
-
-    // Show BLE diagnostic messages as snackbars (debug aid)
-    ref.listen(bleStatusStreamProvider, (_, AsyncValue<String> next) {
-      next.whenData((String msg) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(msg),
-            duration: const Duration(seconds: 3),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: const Color(0xFF1A1A2E),
-          ),
-        );
       });
     });
 

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/database/database.dart';
+import '../../../scanner/presentation/providers/scanner_provider.dart';
 import '../providers/farm_provider.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -365,12 +366,15 @@ class _FarmSetupPage extends StatelessWidget {
 
 // ─── Page 3: Scanner ──────────────────────────────────────────────────────────
 
-class _ScannerPage extends StatelessWidget {
+class _ScannerPage extends ConsumerWidget {
   final Future<void> Function() onFinish;
   const _ScannerPage({required this.onFinish});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final String? connectedName = ref.watch(connectedDeviceNameProvider);
+    final bool isConnected = connectedName != null;
+
     return Padding(
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -380,19 +384,25 @@ class _ScannerPage extends StatelessWidget {
             width: 100,
             height: 100,
             decoration: BoxDecoration(
-              color: const Color(0xFFF0A500).withValues(alpha: 0.1),
+              color: isConnected
+                  ? const Color(0xFF1A7A3C).withValues(alpha: 0.1)
+                  : const Color(0xFFF0A500).withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
-              Icons.qr_code_scanner_rounded,
+            child: Icon(
+              isConnected
+                  ? Icons.bluetooth_connected_rounded
+                  : Icons.qr_code_scanner_rounded,
               size: 56,
-              color: Color(0xFFF0A500),
+              color: isConnected
+                  ? const Color(0xFF1A7A3C)
+                  : const Color(0xFFF0A500),
             ),
           ),
           const SizedBox(height: 32),
-          const Text(
-            'Connect your EID Reader',
-            style: TextStyle(
+          Text(
+            isConnected ? 'Reader Connected!' : 'Connect your EID Reader',
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w800,
               color: Color(0xFF0D1F14),
@@ -400,9 +410,11 @@ class _ScannerPage extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
-          const Text(
-            'Connect a Bluetooth EID reader to scan animal tags directly. You can skip this and connect later from settings.',
-            style: TextStyle(
+          Text(
+            isConnected
+                ? 'Your EID reader "$connectedName" is connected and ready to scan tags.'
+                : 'Connect a Bluetooth EID reader to scan animal tags directly. You can skip this and connect later from settings.',
+            style: const TextStyle(
               fontSize: 14,
               color: Color(0xFF888888),
               height: 1.6,
@@ -414,31 +426,42 @@ class _ScannerPage extends StatelessWidget {
             width: double.infinity,
             height: 52,
             child: ElevatedButton(
-              onPressed: () => context.push('/scanner/ble'),
+              onPressed: isConnected
+                  ? onFinish
+                  : () async {
+                      await context.push('/scanner/ble');
+                      // If a device connected while on the BLE screen, finish setup
+                      if (ref.read(connectedDeviceNameProvider) != null) {
+                        onFinish();
+                      }
+                    },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1A7A3C),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14)),
               ),
+              child: Text(
+                isConnected ? 'Continue to Farrax' : 'Connect Reader',
+                style: const TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.w700),
+              ),
+            ),
+          ),
+          if (!isConnected) ...[
+            const SizedBox(height: 14),
+            TextButton(
+              onPressed: onFinish,
               child: const Text(
-                'Connect Reader',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                'Skip for now',
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Color(0xFF888888),
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 14),
-          TextButton(
-            onPressed: onFinish,
-            child: const Text(
-              'Skip for now',
-              style: TextStyle(
-                fontSize: 15,
-                color: Color(0xFF888888),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
+          ],
         ],
       ),
     );

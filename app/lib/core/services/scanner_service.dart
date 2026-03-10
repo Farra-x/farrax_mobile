@@ -8,6 +8,7 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Known reader device name fragments
 const List<String> _knownDeviceNames = ['Farrax-Scanner', 'Farrax', 'XRS2', 'HR5', 'AWR300'];
@@ -19,13 +20,8 @@ class ScannerService {
   final StreamController<BluetoothDevice?> _connectionController =
       StreamController<BluetoothDevice?>.broadcast();
 
-  /// Emits diagnostic status messages (subscribe to show as snackbars).
-  final StreamController<String> _statusController =
-      StreamController<String>.broadcast();
-
   Stream<String> get tagStream => _tagController.stream;
   Stream<BluetoothDevice?> get connectionStream => _connectionController.stream;
-  Stream<String> get statusStream => _statusController.stream;
 
   BluetoothDevice? _connectedDevice;
   StreamSubscription<List<int>>? _txSubscription;
@@ -61,25 +57,58 @@ class ScannerService {
     return _knownDeviceNames.any((n) => name.contains(n.toUpperCase()));
   }
 
+  static const String _kLastDeviceId = 'last_ble_device_id';
+
   Future<void> connectToDevice(BluetoothDevice device) async {
     await disconnectDevice();
     await device.connect(timeout: const Duration(seconds: 10));
     _connectedDevice = device;
     _connectionController.add(device);
+    // Persist device ID for auto-reconnect on next launch
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_kLastDeviceId, device.remoteId.str);
     await _subscribeToFarraxChar(device);
   }
 
-  Future<void> disconnectDevice() async {
+  Future<void> disconnectDevice({bool forget = false}) async {
     await _txSubscription?.cancel();
     _txSubscription = null;
     await _connectedDevice?.disconnect();
     _connectedDevice = null;
     _connectionController.add(null);
+    if (forget) {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_kLastDeviceId);
+    }
+  }
+
+  /// Called on app start — silently reconnects to the last known device.
+  Future<void> tryAutoReconnect() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? savedId = prefs.getString(_kLastDeviceId);
+    if (savedId == null) return;
+
+    // Wait up to 8 seconds for the BLE adapter to be ready
+    try {
+      await FlutterBluePlus.adapterState
+          .where((BluetoothAdapterState s) => s == BluetoothAdapterState.on)
+          .first
+          .timeout(const Duration(seconds: 8));
+    } catch (_) {
+      return; // BLE never turned on
+    }
+
+    try {
+      final BluetoothDevice device =
+          BluetoothDevice(remoteId: DeviceIdentifier(savedId));
+      await connectToDevice(device);
+    } catch (_) {
+      // Device not in range or unavailable — silently skip
+    }
   }
 
   Future<void> _subscribeToFarraxChar(BluetoothDevice device) async {
     final List<BluetoothService> services = await device.discoverServices();
-    _statusController.add('Found ${services.length} BLE service(s)');
 
     // Try exact UUID match first, then fall back to any notify characteristic
     BluetoothCharacteristic? target;
@@ -87,7 +116,6 @@ class ScannerService {
     for (final BluetoothService service in services) {
       final String svcId = service.uuid.str128.toLowerCase();
       if (svcId.contains('4fafc201')) {
-        _statusController.add('Farrax service matched');
         for (final BluetoothCharacteristic char in service.characteristics) {
           if (char.uuid.str128.toLowerCase().contains('beb5483e')) {
             target = char;
@@ -99,7 +127,6 @@ class ScannerService {
 
     // Fallback: first notify-capable characteristic across all services
     if (target == null) {
-      _statusController.add('UUID not matched — trying any notify char');
       for (final BluetoothService service in services) {
         for (final BluetoothCharacteristic char in service.characteristics) {
           if (char.properties.notify) {
@@ -111,24 +138,14 @@ class ScannerService {
       }
     }
 
-    if (target == null) {
-      _statusController.add('ERROR: no notify characteristic found');
-      return;
-    }
+    if (target == null) return;
 
     await target.setNotifyValue(true);
-    _statusController.add('Subscribed to ${target.uuid.str128} — ready');
 
     _txSubscription = target.onValueReceived.listen((List<int> value) {
       final String raw = utf8.decode(value).trim();
-      _statusController.add('BLE raw: "$raw"');
       final String? tag = validateTag(raw);
-      if (tag != null) {
-        _statusController.add('Tag valid: $tag');
-        _tagController.add(tag);
-      } else {
-        _statusController.add('Tag invalid — no popup');
-      }
+      if (tag != null) _tagController.add(tag);
     });
   }
 
@@ -208,7 +225,6 @@ class ScannerService {
     disconnectDevice();
     _tagController.close();
     _connectionController.close();
-    _statusController.close();
   }
 }
 

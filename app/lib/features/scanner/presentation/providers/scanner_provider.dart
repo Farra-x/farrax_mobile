@@ -14,20 +14,20 @@ ScannerService scannerService(ScannerServiceRef ref) {
   return svc;
 }
 
+// ─── Auto-Reconnect ───────────────────────────────────────────────────────────
+// Runs once on app start; silently reconnects to the last known device.
+
+@Riverpod(keepAlive: true)
+Future<void> bleAutoReconnect(BleAutoReconnectRef ref) {
+  return ref.watch(scannerServiceProvider).tryAutoReconnect();
+}
+
 // ─── BLE Tag Stream ───────────────────────────────────────────────────────────
 // keepAlive so it never misses a tag notification, even off the home screen.
 
 @Riverpod(keepAlive: true)
 Stream<String> bleTagStream(BleTagStreamRef ref) {
   return ref.watch(scannerServiceProvider).tagStream;
-}
-
-// ─── BLE Status Stream ────────────────────────────────────────────────────────
-// Diagnostic messages from the scanner service (subscription setup, raw bytes).
-
-@Riverpod(keepAlive: true)
-Stream<String> bleStatusStream(BleStatusStreamRef ref) {
-  return ref.watch(scannerServiceProvider).statusStream;
 }
 
 // ─── Connected Device Stream ──────────────────────────────────────────────────

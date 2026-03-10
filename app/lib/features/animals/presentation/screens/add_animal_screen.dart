@@ -525,6 +525,8 @@ class _TagField extends StatelessWidget {
         fontFamily: 'monospace',
         fontWeight: FontWeight.w600,
         letterSpacing: 1,
+        fontSize: 15,
+        color: Color(0xFF1A1A1A),
       ),
       decoration: InputDecoration(
         hintText: 'IE141123456789',
@@ -668,6 +670,11 @@ class _FormTextField extends StatelessWidget {
       controller: controller,
       maxLines: maxLines,
       validator: validator,
+      style: const TextStyle(
+        fontSize: 15,
+        color: Color(0xFF1A1A1A),
+        fontWeight: FontWeight.w500,
+      ),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(color: Color(0xFFAAAAAA)),
